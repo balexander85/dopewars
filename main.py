@@ -4,15 +4,12 @@ prompt = "> "
 border = '-' * 50
 menuOptions = ["Buy", "Sell", "Leave City", "Quit"]                        # List of menu items
 drugOptions = ["weed", "coke", "heroin"]                                   # List of drugs to be bought and sold
-weed_Cost = 50                                                             # Cost of weed
-coke = 0
-heroin = 0
 
 
 def print_list(itemList):
     '''Prints item list with numbering.'''
-    for k, v in enumerate(itemList, 1):
-        print '{}) {}'.format(k, v)
+    for n, v in enumerate(itemList, 1):
+        print '{}) {}'.format(n, v)
     print border
 
 
@@ -23,9 +20,45 @@ def prompt_user_for_answer(query, options=None):
     try:
         return int(result)
     except ValueError:
-        print ('Error: Please enter only the number'
+        print ('Error: Please enter only an integer'
                ' of your choice. {} is not a valid choice.'.format(result))
         return prompt_user_for_answer(query)
+
+
+class Drug(object):
+    """docstring for Drug"""
+    def __init__(self, drugType, streetValue, quantity):
+        super(Drug, self).__init__()
+        self.drugType = drugType
+        self.streetValue = streetValue
+        self.drugAmount = quantity
+
+    def get_drug_cost(self):
+        return self.drugAmount * self.streetValue
+
+
+class Weed(Drug):
+    """docstring for Weed"""
+    def __init__(self, quantity):
+        self.drugType = 'Weed'
+        self.streetValue = 50
+        self.drugAmount = quantity
+
+
+class Coke(Drug):
+    """docstring for Coke"""
+    def __init__(self, quantity):
+        self.drugType = 'Coke'
+        self.streetValue = 300
+        self.drugAmount = quantity
+
+
+class Heroin(Drug):
+    """docstring for Heroin"""
+    def __init__(self, quantity):
+        self.drugType = 'Heroin'
+        self.streetValue = 500
+        self.drugAmount = quantity
 
 
 class Person(object):
@@ -101,17 +134,17 @@ def sell(player):
 
 
 def buy_drug(player, drugType):
-    drugAmount = prompt_user_for_answer('How much would you like to buy?\n')
-    drugCost = drugAmount * weed_Cost
+    desiredQuantity = prompt_user_for_answer('How much would you like to buy?\n')
+    drugCost = Weed(desiredQuantity).get_drug_cost()
     if player.bank_roll_debit(drugCost):
         print "Cool deal!"
-        player.drug_stash_credit(drugType, drugAmount)
+        player.drug_stash_credit(drugType, desiredQuantity)
 
 
 def sell_drug(player, drugType):
-    drugAmount = prompt_user_for_answer('How much would you like to sell?\n')
-    drugCost = drugAmount * weed_Cost
-    if player.drug_stash_debit(drugType, drugAmount):
+    desiredQuantity = prompt_user_for_answer('How much would you like to sell?\n')
+    drugCost = Weed(desiredQuantity).get_drug_cost()
+    if player.drug_stash_debit(drugType, desiredQuantity):
         print "Cool deal!"
         player.bank_roll_credit(drugCost)
 
@@ -119,6 +152,8 @@ def sell_drug(player, drugType):
 if __name__ == "__main__":
     # name = raw_input("What's your name?\n" + prompt)
     name = 'Brian'
+    print border
+    print '********Welcome to DopeWars!*************'
     player = Person(name)
     choice = 0
 
