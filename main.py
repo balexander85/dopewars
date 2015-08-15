@@ -1,14 +1,14 @@
 '''Notes for DopeWars recreated'''
-# Assign variables values
+
 PROMPT = "> "
 BORDER = '-' * 50
-MENUOPTIONS = ["Buy", "Sell", "Leave City", "Quit"]                        # List of menu items
+MENUOPTIONS = ["Buy", "Sell", "Leave City", "Quit"]
 DRUGOPTIONS = {1: 'Weed', 2: 'Coke', 3: 'Heroin'}
 
 
-def print_list(itemList):
+def print_list(item_list):
     '''Prints item list with numbering.'''
-    for number, item in enumerate(itemList, 1):
+    for number, item in enumerate(item_list, 1):
         print '{}) {}'.format(number, item)
     print BORDER
 
@@ -34,38 +34,62 @@ class Drug(object):
     '''docstring for Drug'''
     def __init__(self, drug, quantity):
         super(Drug, self).__init__()
-        self.drugType = drug.drugType
-        self.streetValue = drug.streetValue
-        self.drugAmount = quantity
+        self.drug_type = drug.drug_type
+        self.street_value = drug.street_value
+        self.drug_amount = quantity
 
     def get_drug_total_cost(self):
-        '''Multiply value by quantity.'''
-        return self.drugAmount * self.streetValue
+        '''Multiply value by quantity to get total cost of drug.'''
+        return self.drug_amount * self.street_value
+
+    def function(self):
+        '''Need to update with something useful.'''
+        pass
 
 
-class Weed:
+class Weed(object):
     '''docstring for Weed'''
     def __init__(self):
-        self.drugType = 'Weed'
-        self.streetValue = 50
+        self.drug_type = 'Weed'
+        self.street_value = 50
 
     def return_drug_name(self):
         '''Return drug type name.'''
-        return self.drugType
+        return self.drug_type
+
+    def return_drug_value(self):
+        '''Return drug value.'''
+        return self.street_value
 
 
-class Coke:
+class Coke(object):
     '''docstring for Coke'''
     def __init__(self):
-        self.drugType = 'Coke'
-        self.streetValue = 300
+        self.drug_type = 'Coke'
+        self.street_value = 300
+
+    def return_drug_name(self):
+        '''Return drug type name.'''
+        return self.drug_type
+
+    def return_drug_value(self):
+        '''Return drug value.'''
+        return self.street_value
 
 
-class Heroin:
+class Heroin(object):
     '''docstring for Heroin'''
     def __init__(self):
-        self.drugType = 'Heroin'
-        self.streetValue = 500
+        self.drug_type = 'Heroin'
+        self.street_value = 500
+
+    def return_drug_name(self):
+        '''Return drug type name.'''
+        return self.drug_type
+
+    def return_drug_value(self):
+        '''Return drug value.'''
+        return self.street_value
 
 
 class Player(object):
@@ -73,49 +97,49 @@ class Player(object):
     def __init__(self, name):
         super(Player, self).__init__()
         self.name = name
-        self.lifeBal = 100                 # Set to 100, once you hit zero, game over
-        self.bankRoll = 1000               # Set to 1000, may adjust later
-        self.originLocation = 'Austin'     # Set to Austin for now
-        self.currentLoction = 'Austin'
-        self.drugStash = {'Weed': 0, 'Coke': 0, 'Heroin': 0}
+        self.life_bal = 100                 # Set to 100, once you hit zero, game over
+        self.bank_roll = 1000               # Set to 1000, may adjust later
+        self.origin_location = 'Austin'     # Set to Austin for now
+        self.current_location = 'Austin'
+        self.drug_stash = {'Weed': 0, 'Coke': 0, 'Heroin': 0}
 
     def player_stats(self):
         '''Prints Player's stats.'''
-        stats = {'Player': self.name, 'Health': self.lifeBal,
-                 'Bank': self.bankRoll, 'Location': self.currentLoction,
-                 'Drug Stash': self.drugStash}
+        stats = {'Player': self.name, 'Health': self.life_bal,
+                 'Bank': self.bank_roll, 'Location': self.current_location,
+                 'Drug Stash': self.drug_stash}
         print BORDER
-        for k, v in stats.iteritems():
-            print '{} : {}'.format(k, v)
+        for key, value in stats.iteritems():
+            print '{} : {}'.format(key, value)
         print BORDER
 
     def bank_roll_debit(self, amount):
-        '''Debit amount from bankRoll if player has enough money.'''
-        if amount <= self.bankRoll:
-            self.bankRoll -= amount
+        '''Debit amount from bank_roll if player has enough money.'''
+        if amount <= self.bank_roll:
+            self.bank_roll -= amount
             return True
         else:
             print "You do not have enough money!"
 
-    def drug_stash_debit(self, drugType, amount):
+    def drug_stash_debit(self, drug_type, amount):
         '''Subtract drugs from stash if player has enough drugs.'''
-        if amount <= self.drugStash[drugType]:
-            self.drugStash[drugType] -= amount
+        if amount <= self.drug_stash[drug_type]:
+            self.drug_stash[drug_type] -= amount
             return True
         else:
             print "You do not have enough drugs to sell!"
 
     def bank_roll_credit(self, amount):
-        '''Credit to bankRoll.'''
-        self.bankRoll += amount
+        '''Credit to bank_roll.'''
+        self.bank_roll += amount
 
-    def drug_stash_credit(self, drugType, amount):
+    def drug_stash_credit(self, drug_type, amount):
         '''Add drugs to stash.'''
-        self.drugStash[drugType] += amount
+        self.drug_stash[drug_type] += amount
 
     def bad_choice(self):
         '''Temp method, probably will delete.'''
-        self.lifeBal -= 25
+        self.life_bal -= 25
 
 
 # ||||||||||||||||||||BEGINNING OF FUNCTIONS||||||||||||||||||||||||||||||
@@ -144,45 +168,46 @@ def sell(player):
 
 def buy_drug(player, drug):
     '''A player determines how much of what drug they should buy.'''
-    desiredQuantity = prompt_user_for_answer('How much would you like to buy?\n')
-    drugCost = Drug(drug(), desiredQuantity).get_drug_total_cost()
-    if player.bank_roll_debit(drugCost):
+    desired_quantity = prompt_user_for_answer('How much would you like to buy?\n')
+    drug_cost = Drug(drug(), desired_quantity).get_drug_total_cost()
+    if player.bank_roll_debit(drug_cost):
         print "Cool deal!"
-        player.drug_stash_credit(drug().drugType, desiredQuantity)
+        player.drug_stash_credit(drug().drug_type, desired_quantity)
 
 
 def sell_drug(player, drug):
     '''A player determines how much of what drug they should sell.'''
-    desiredQuantity = prompt_user_for_answer('How much would you like to sell?\n')
-    drugCost = Drug(drug(), desiredQuantity).get_drug_total_cost()
-    if player.drug_stash_debit(drug().drugType, desiredQuantity):
+    desired_quantity = prompt_user_for_answer('How much would you like to sell?\n')
+    drug_cost = Drug(drug(), desired_quantity).get_drug_total_cost()
+    if player.drug_stash_debit(drug().drug_type, desired_quantity):
         print "Cool deal!"
-        player.bank_roll_credit(drugCost)
+        player.bank_roll_credit(drug_cost)
 
 
 if __name__ == "__main__":
-    name = raw_input("What's your name?\n" + PROMPT)
+    NAME = 'B-Axe'
+    # NAME = raw_input("What's your name?\n" + PROMPT)
     print BORDER
     print '********Welcome to DopeWars!*************'
-    player = Player(name)
-    choice = 0
+    player = Player(NAME)
+    menu_selection = 0
 
-    while choice != 4:
-        if player.lifeBal <= 0:
-            choice = dead()
+    while menu_selection != 4:
+        if player.life_bal <= 0:
+            menu_selection = dead()
             game_over()
         else:
             player.player_stats()
-            choice = prompt_user_for_answer('What would you like to do?\n', options=MENUOPTIONS)
+            menu_selection = prompt_user_for_answer('What would you like to do?\n', options=MENUOPTIONS)
 
-            if choice == 1:
+            if menu_selection == 1:
                 buy(player)
-            elif choice == 2:
+            elif menu_selection == 2:
                 sell(player)
-            elif choice == 3:
+            elif menu_selection == 3:
                 print ('Not possible to leave the city yet. '
-                       'Enjoy {} while you are there!'.format(player.originLocation))
-            elif choice == 4:
+                       'Enjoy {} while you are there!'.format(player.current_location))
+            elif menu_selection == 4:
                 game_over()
             else:
                 print "You chose incorrectly, try again!"
