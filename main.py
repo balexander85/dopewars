@@ -3,7 +3,6 @@
 PROMPT = "> "
 BORDER = '-' * 50
 MENUOPTIONS = ["Buy", "Sell", "Leave City", "Quit"]
-DRUGOPTIONS = {1: 'Weed', 2: 'Coke', 3: 'Heroin'}
 
 
 def print_list(item_list):
@@ -28,6 +27,31 @@ def prompt_user_for_answer(query, options=None):
                ' of your choice. "{}" is not a valid choice.'.format(result))
         return prompt_user_for_answer(query, options)
     return result
+
+
+class Drugs(object):
+    """docstring for Drugs"""
+    def __init__(self, drug_type):
+        super(Drugs, self).__init__()
+        self.drug_type = drug_type
+        self.drug_options = {1: Weed(), 2: Coke(), 3: Heroin()}
+
+    def get_drug_class(self):
+        '''Get the int value for the drug type.'''
+        return self.drug_options[self.drug_type]
+
+    def get_drug_option_names(self):
+        '''Returns the str names for the drugs.'''
+        return [name.drug_type for name in self.drug_options.values()]
+
+    def get_drug_class_from_string(self):
+        '''Get the string value name of the drug type.'''
+        return [drug for drug in self.drug_options.values()
+                if drug.drug_type == self.drug_type]
+
+    def get_street_values_of_all_drugs(self):
+        '''probably will delete but list of drug prices only.'''
+        return [drug.street_value for drug in self.drug_options.values()]
 
 
 class Drug(object):
@@ -102,6 +126,7 @@ class Player(object):
         self.origin_location = 'Austin'     # Set to Austin for now
         self.current_location = 'Austin'
         self.drug_stash = {'Weed': 0, 'Coke': 0, 'Heroin': 0}
+        self.menu_selection = 0
 
     def player_stats(self):
         '''Prints Player's stats.'''
@@ -156,30 +181,32 @@ def dead():
 
 def buy(player):
     '''A player determines what kind of drug they should buy.'''
-    choice = prompt_user_for_answer('What would you like to buy?\n', options=DRUGOPTIONS.values())
-    buy_drug(player, eval(DRUGOPTIONS.get(choice)))
+    choice = prompt_user_for_answer('What would you like to buy?\n',
+                                    options=Drugs(1).get_drug_option_names())
+    buy_drug(player, Drugs(choice).get_drug_class())
 
 
 def sell(player):
     '''A player determines what kind of drug they should sell.'''
-    choice = prompt_user_for_answer('What would you like to sell?\n', options=DRUGOPTIONS.values())
-    sell_drug(player, eval(DRUGOPTIONS.get(choice)))
+    choice = prompt_user_for_answer('What would you like to sell?\n',
+                                    options=Drugs(1).get_drug_option_names())
+    sell_drug(player, Drugs(choice).get_drug_class())
 
 
 def buy_drug(player, drug):
     '''A player determines how much of what drug they should buy.'''
     desired_quantity = prompt_user_for_answer('How much would you like to buy?\n')
-    drug_cost = Drug(drug(), desired_quantity).get_drug_total_cost()
+    drug_cost = Drug(drug, desired_quantity).get_drug_total_cost()
     if player.bank_roll_debit(drug_cost):
         print "Cool deal!"
-        player.drug_stash_credit(drug().drug_type, desired_quantity)
+        player.drug_stash_credit(drug.drug_type, desired_quantity)
 
 
 def sell_drug(player, drug):
     '''A player determines how much of what drug they should sell.'''
     desired_quantity = prompt_user_for_answer('How much would you like to sell?\n')
-    drug_cost = Drug(drug(), desired_quantity).get_drug_total_cost()
-    if player.drug_stash_debit(drug().drug_type, desired_quantity):
+    drug_cost = Drug(drug, desired_quantity).get_drug_total_cost()
+    if player.drug_stash_debit(drug.drug_type, desired_quantity):
         print "Cool deal!"
         player.bank_roll_credit(drug_cost)
 
@@ -189,26 +216,26 @@ if __name__ == "__main__":
     # NAME = raw_input("What's your name?\n" + PROMPT)
     print BORDER
     print '********Welcome to DopeWars!*************'
-    player = Player(NAME)
-    menu_selection = 0
+    PLAYER_INSTANCE = Player(NAME)
 
-    while menu_selection != 4:
-        if player.life_bal <= 0:
-            menu_selection = dead()
+    while PLAYER_INSTANCE.menu_selection != 4:
+        if PLAYER_INSTANCE.life_bal <= 0:
+            PLAYER_INSTANCE.menu_selection = dead()
             game_over()
         else:
-            player.player_stats()
-            menu_selection = prompt_user_for_answer('What would you like to do?\n', options=MENUOPTIONS)
+            PLAYER_INSTANCE.player_stats()
+            PLAYER_INSTANCE.menu_selection = prompt_user_for_answer('What would you like to do?\n',
+                                                                    options=MENUOPTIONS)
 
-            if menu_selection == 1:
-                buy(player)
-            elif menu_selection == 2:
-                sell(player)
-            elif menu_selection == 3:
+            if PLAYER_INSTANCE.menu_selection == 1:
+                buy(PLAYER_INSTANCE)
+            elif PLAYER_INSTANCE.menu_selection == 2:
+                sell(PLAYER_INSTANCE)
+            elif PLAYER_INSTANCE.menu_selection == 3:
                 print ('Not possible to leave the city yet. '
-                       'Enjoy {} while you are there!'.format(player.current_location))
-            elif menu_selection == 4:
+                       'Enjoy {} while you are there!'.format(PLAYER_INSTANCE.current_location))
+            elif PLAYER_INSTANCE.menu_selection == 4:
                 game_over()
             else:
                 print "You chose incorrectly, try again!"
-                player.bad_choice()
+                PLAYER_INSTANCE.bad_choice()
