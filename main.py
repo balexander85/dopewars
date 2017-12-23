@@ -5,7 +5,6 @@ import os
 
 PROMPT = "> "
 BORDER = '-' * 50
-MENU_OPTIONS = ["Buy", "Sell", "Leave City", "Quit"]
 
 
 def print_list(item_list):
@@ -90,7 +89,7 @@ class Drugs:
         drug_cost = drug.get_drug_total_cost(desired_quantity)
         if player.cash_debit(drug_cost):
             player.stash_credit(drug.drug_type, desired_quantity)
-            player.bag_size -= desired_quantity
+            player.success()
 
     def sell(self, player):
         """A player determines what kind of drug they should sell."""
@@ -106,7 +105,7 @@ class Drugs:
         drug_cost = drug.get_drug_total_cost(desired_quantity)
         if player.stash_debit(drug.drug_type, desired_quantity):
             player.cash_credit(drug_cost)
-            player.bag_size += desired_quantity
+            player.success()
 
 
 class Transaction:
@@ -129,7 +128,6 @@ class Transaction:
     def cash_credit(self, amount):
         """Add cash"""
         self.cash += amount
-        self.success()
 
     def cash_debit(self, amount):
         """Debit amount from bank_roll if player has enough money."""
@@ -142,12 +140,13 @@ class Transaction:
     def stash_credit(self, drug_type, amount):
         """Add cash"""
         self.drug_stash[drug_type] += amount
-        self.success()
+        self.bag_size -= amount
 
     def stash_debit(self, drug_type, amount):
         """Subtract drugs from stash if player has enough drugs."""
         if amount <= self.drug_stash[drug_type]:
             self.drug_stash[drug_type] -= amount
+            self.bag_size += amount
             return True
         else:
             self.not_enough("drugs to sell")
@@ -291,9 +290,9 @@ class Stats:
 
 class Travel:
 
-    def __init__(self, player: Player):
+    def __init__(self, traveler: Player):
         input("Not possible to leave the city yet. "
-              f"Enjoy {player.current_location}"
+              f"Enjoy {traveler.current_location}"
               "while you are there!\n"
               "Press Enter to continue...\n")
 
@@ -317,9 +316,10 @@ def main_menu(player: Player):
     """
         Main Menu
     """
+    menu_options = ["Buy", "Sell", "Leave City", "Quit"]
     menu_selection = prompt_user_for_answer(
         'What would you like to do?\n',
-        options=MENU_OPTIONS
+        options=menu_options
     )
 
     if menu_selection == 1:
@@ -337,8 +337,7 @@ def main_menu(player: Player):
 
 
 if __name__ == "__main__":
-    NAME = 'B-Axe'
-    # NAME = raw_input("What's your name?\n" + PROMPT)
+    NAME = input("What's your name?\n" + PROMPT)
     print(BORDER)
     print('********Welcome to DopeWars!*************\n')
     player = Player(NAME)
